@@ -1,0 +1,72 @@
+---
+- name: Copy environment file
+  copy:
+    src: /var/www/html/{{ work_dir }}/.env.example
+    dest: /var/www/html/{{ work_dir }}/.env
+    remote_src: true
+
+- name: Change APP_URL
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^APP_URL='
+    line: 'APP_URL=https://{{ work_domain }}'
+
+- name: Change database host
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^DB_HOST='
+    line: 'DB_HOST={{ mysql_host }}'
+
+- name: Change database user
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^DB_USERNAME='
+    line: 'DB_USERNAME={{ mysql_user }}'
+
+- name: Change database password
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^DB_PASSWORD='
+    line: 'DB_PASSWORD={{ mysql_password }}'
+
+- name: Change database name
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^DB_DATABASE='
+    line: 'DB_DATABASE={{ mysql_database }}'
+
+- name: Change minio acccess key
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^S3_KEY='
+    line: 'S3_KEY={{ minio_key }}'
+
+- name: Change minio secret key
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^S3_SECRET_KEY='
+    line: 'S3_SECRET_KEY={{ minio_secret }}'
+
+- name: Change minio host
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^S3_AWS_URL='
+    line: 'S3_AWS_URL={{ minio_host }}'
+
+- name: Change minio bucket
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^S3_BUCKET='
+    line: 'S3_BUCKET={{ minio_bucket }}'
+
+- name: Change minio region
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^S3_REGION='
+    line: 'S3_REGION=us-east-1'
+
+- name: Change minio use endpoint
+  lineinfile:
+    path: /var/www/html/{{ work_dir }}/.env
+    regexp: '^S3_USE_ENDPOINT='
+    line: 'S3_USE_ENDPOINT=true'
