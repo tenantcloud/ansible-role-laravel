@@ -1,61 +1,31 @@
-ansible_role_tenantcloud.laravel
+TenantCloud Laravel Role
 =========
 
-Ansible role for install and setup laravel framework
+The role will enable rapid deployment of project Laravel 
 
 Requirements
 ------------
 
-Preconfigured Ubuntu server with MySQL 5.7, PHP, Redis, Nginx
+Need be installed NGINX, PHP, MySQL Server
 
 Role Variables
 --------------
 
-work_domain: mydomain.dev
-work_dir: myprojectdirectory
-project_git: git@bitbucket.org:mycompany/myproject.git
-mysql_host: 127.0.0.1
-mysql_user: root
-mysql_password:
-mysql_database: mydatabase
-minio_key: myaccesskey
-minio_secret: mysecretkey
-minio_host: https://minio.mydomain.dev:9002
-minio_bucket: myminiobucket
+A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 
 Dependencies
 ------------
 
-After playbook finished you must enter your project directory and run some command.
-
-* For Emailer:
-```bash
-php artisan migrate
-npm run watch
-```
+A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
-```yaml
-- name: Setup
-  hosts: localhost
-  vars:
-    work_domain: emailer.dev
-    work_dir: emailer
-    project_git: git@bitbucket.org:mycompany/emailer.git
-    mysql_host: 127.0.0.1
-    mysql_user: root
-    mysql_password:
-    mysql_database: emailer
-    minio_key: accesskey
-    minio_secret: secretkey
-    minio_host: https://minio.emailer.dev:9002
-    minio_bucket: emailer
-  remote_user: user
-  roles:
-    - tenantcloud.laravel
-```
+Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+
+    - hosts: localhost
+      roles:
+         - { role: tenantcloud.laravel, project_repo: "", project_path: "" }
 
 License
 -------

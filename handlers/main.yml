@@ -1,6 +1,2 @@
 ---
-- name: Restart Nginx
-  become: true
-  service:
-    name: nginx
-    state: restarted
+# handlers file for laravel
