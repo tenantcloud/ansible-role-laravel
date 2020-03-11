@@ -1,2 +1,4 @@
 ---
 # defaults file for laravel
+
+nodejs_version: "10.x"

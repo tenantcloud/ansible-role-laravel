@@ -8,11 +8,20 @@
 
 - name: Create database
   mysql_db:
-    login_user: "{{ mysql_user }}"
-    login_password: ""
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
     name: "{{ mysql_database }}"
     state: present
   when: ansible_distribution == 'Ubuntu'
+
+- name: Create database user
+  mysql_user:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_db_user }}"
+    password: "{{ mysql_db_user_pass }}"
+    priv: '{{ mysql_database }}.*:ALL'
+    state: present
 
 - name: Composer install
   composer:

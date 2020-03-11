@@ -35,37 +35,37 @@
     regexp: '^DB_DATABASE='
     line: 'DB_DATABASE={{ mysql_database }}'
 
-- name: Change minio acccess key
+- name: Change s3 acccess key
   lineinfile:
     path: /var/www/html/{{ work_dir }}/.env
     regexp: '^S3_KEY='
-    line: 'S3_KEY={{ minio_key }}'
+    line: 'S3_KEY={{ s3_key }}'
 
-- name: Change minio secret key
+- name: Change s3 secret key
   lineinfile:
     path: /var/www/html/{{ work_dir }}/.env
     regexp: '^S3_SECRET_KEY='
-    line: 'S3_SECRET_KEY={{ minio_secret }}'
+    line: 'S3_SECRET_KEY={{ s3_secret }}'
 
-- name: Change minio host
+- name: Change s3 host
   lineinfile:
     path: /var/www/html/{{ work_dir }}/.env
     regexp: '^S3_AWS_URL='
-    line: 'S3_AWS_URL={{ minio_host }}'
+    line: 'S3_AWS_URL={{ s3_host }}'
 
-- name: Change minio bucket
+- name: Change s3 bucket
   lineinfile:
     path: /var/www/html/{{ work_dir }}/.env
     regexp: '^S3_BUCKET='
-    line: 'S3_BUCKET={{ minio_bucket }}'
+    line: 'S3_BUCKET={{ s3_bucket }}'
 
-- name: Change minio region
+- name: Change s3 region
   lineinfile:
     path: /var/www/html/{{ work_dir }}/.env
     regexp: '^S3_REGION='
-    line: 'S3_REGION=us-east-1'
+    line: 'S3_REGION={{ s3_region }}'
 
-- name: Change minio use endpoint
+- name: Change s3 use endpoint
   lineinfile:
     path: /var/www/html/{{ work_dir }}/.env
     regexp: '^S3_USE_ENDPOINT='

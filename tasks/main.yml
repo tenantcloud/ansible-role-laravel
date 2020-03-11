@@ -1,2 +1,6 @@
 ---
 # tasks file for laravel
+
+- include: download-project.yml
+- include: setup-environment.yml
+- include: setup-project.yml
