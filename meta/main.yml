@@ -20,6 +20,10 @@ galaxy_info:
       versions:
         - jessie
         - stretch
+    - name: MacOSX
+      versions:
+        - 10.14
+        - 10.15
 
   galaxy_tags:
     - laravel

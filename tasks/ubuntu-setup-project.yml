@@ -1,0 +1,110 @@
+---
+- name: Ensure bitbucket.org is a known host
+  lineinfile:
+    dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa bitbucket.org') }}"
+    regexp: "^bitbucket\\.org"
+
+- name: Clone laravel project
+  git:
+    repo: "{{ project_git }}"
+    dest: "{{ work_dir }}"
+
+- name: Copy environment file
+  copy:
+    src: "{{ work_dir }}/.env.example"
+    dest: "{{ work_dir }}/.env"
+    remote_src: true
+
+- name: Change APP_URL
+  lineinfile:
+    path: "{{ item.path }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { path: '{{ work_dir }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^DB_USERNAME=', line: 'DB_USERNAME={{ mysql_db_user }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD={{ mysql_db_user_pass }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^DB_DATABASE=', line: 'DB_DATABASE={{ mysql_database }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^S3_KEY=', line: 'S3_KEY={{ s3_key }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^S3_SECRET_KEY=', line: 'S3_SECRET_KEY={{ s3_secret }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^S3_AWS_URL=', line: 'S3_AWS_URL={{ s3_host }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}' }
+    - { path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true' }
+
+- name: Install PyMySQL
+  pip:
+    name: pymysql
+    executable: pip3
+  become: true
+
+- name: Create database
+  mysql_db:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_database }}"
+    state: present
+
+- name: Create database user
+  mysql_user:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_db_user }}"
+    password: "{{ mysql_db_user_pass }}"
+    priv: '{{ mysql_database }}.*:ALL'
+    state: present
+
+- name: Composer install
+  composer:
+    command: require
+    working_dir: "{{ work_dir }}"
+
+- name: Ensure Nodejs dependencies are present.
+  apt:
+    name:
+      - apt-transport-https
+      - gnupg2
+    state: present
+
+- name: Add NodeSource apt key.
+  apt_key:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+    id: "68576280"
+    state: present
+  become: true
+
+- name: Add NodeSource repositories for Node.js.
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop:
+    - "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+  become: true
+  register: node_repo
+
+- name: Update apt cache if repo was added.
+  apt: update_cache=yes
+  when: node_repo.changed
+  become: true
+
+- name: Ensure Node.js and npm are installed.
+  apt:
+    name: "nodejs={{ nodejs_version|regex_replace('x', '') }}*"
+    state: present
+  become: true
+
+- name: Run npm ci
+  npm:
+    ci: yes
+    path: "{{ work_dir }}"
+
+- name: Copy nginx config file
+  template:
+    src: "{{ work_domain }}.conf.j2"
+    dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
+  notify: Restart Nginx

@@ -1,6 +1,5 @@
 ---
 # tasks file for laravel
 
-- include: download-project.yml
-- include: setup-environment.yml
-- include: setup-project.yml
+- import_tasks: ubuntu-setup-project.yml
+  when: ansible_distribution == 'Ubuntu'

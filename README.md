@@ -39,7 +39,7 @@ Example Playbook
   hosts: localhost
   vars:
     work_domain: laravel.dev
-    work_dir: laravel
+    work_dir: /var/www/html/laravel
     project_git: git@bitbucket.org:mycompany/laravel.git
     mysql_host: 127.0.0.1
     mysql_admin_user: root
