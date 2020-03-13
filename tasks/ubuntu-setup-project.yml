@@ -18,7 +18,7 @@
     dest: "{{ work_dir }}/.env"
     remote_src: true
 
-- name: Change APP_URL
+- name: Change environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
@@ -69,6 +69,7 @@
       - apt-transport-https
       - gnupg2
     state: present
+  become: true
 
 - name: Add NodeSource apt key.
   apt_key:
