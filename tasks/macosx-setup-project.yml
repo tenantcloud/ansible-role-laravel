@@ -1,0 +1,113 @@
+---
+- name: Ensure bitbucket.org is a known host
+  lineinfile:
+    dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
+    create: true
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa bitbucket.org') }}"
+    regexp: "^bitbucket\\.org"
+
+- name: Clone laravel project
+  git:
+    repo: "{{ project_git }}"
+    dest: /Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}
+    version: "{{ project_git_branch }}"
+    force: true
+
+- name: Copy environment file
+  copy:
+    src: /Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env.example
+    dest: /Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env
+    remote_src: true
+
+- name: Change environment file
+  lineinfile:
+    path: "{{ item.path }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^APP_URL=', line: 'APP_URL=http://{{ work_domain }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_USERNAME=', line: 'DB_USERNAME={{ mysql_db_user }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD={{ mysql_db_user_pass }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_DATABASE=', line: 'DB_DATABASE={{ mysql_database }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^S3_KEY=', line: 'S3_KEY={{ s3_key }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^S3_SECRET_KEY=', line: 'S3_SECRET_KEY={{ s3_secret }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^S3_AWS_URL=', line: 'S3_AWS_URL={{ s3_host }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
+
+- name: Install PyMySQL
+  pip:
+    name: pymysql
+    executable: /usr/local/bin/pip3
+  become: true
+
+- name: Create database
+  mysql_db:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_database }}"
+    state: present
+
+- name: Create database user
+  mysql_user:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_db_user }}"
+    password: "{{ mysql_db_user_pass }}"
+    priv: '{{ mysql_database }}.*:ALL'
+    state: present
+
+- name: Install nvm
+  shell: |
+    set -o pipefail
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/{{ nvm_version }}/install.sh | /bin/zsh
+    creates=/Users/{{ work_user }}/.nvm/nvm.sh
+  args:
+    warn: false
+  changed_when: false
+
+- name: Install node and set default version
+  shell: >
+    /bin/zsh -c "source ~/.nvm/nvm.sh && nvm install {{ node_version }} && nvm alias default {{ node_version }}"
+    creates=/Users/{{ work_user }}/.nvm/alias
+  changed_when: false
+
+- name: source zshrc
+  become: false
+  command: /bin/zsh -c "source ~/.zshrc"
+  changed_when: false
+
+- name: Create a symbolic link to npm
+  file:
+    src: /Users/{{ work_user }}/.nvm/versions/node/{{ nvm_node_version }}/bin/npm
+    dest: /usr/local/bin/npm
+    state: link
+
+- name: Create a symbolic link to node
+  file:
+    src: /Users/{{ work_user }}/.nvm/versions/node/{{ nvm_node_version }}/bin/node
+    dest: /usr/local/bin/node
+    state: link
+
+- name: Composer install
+  composer:
+    command: require
+    working_dir: "/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}"
+
+- name: Run npm ci
+  npm:
+    ci: true
+    path: "/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+
+- name: Copy nginx configured files
+  template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
+
+- name: Restart nginx
+  become: true
+  command: /usr/local/bin/brew services restart nginx
+  changed_when: false

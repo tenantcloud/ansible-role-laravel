@@ -1,17 +1,36 @@
-TenantCloud Laravel Role
+tenantcloud.laravel
 =========
 
-The role will enable rapid deployment of project Laravel 
+Ansible role for install laravel project.
+
+  - emailer
+  - tc-ci
+  - tc-dg
 
 Requirements
 ------------
 
-Need be installed NGINX, PHP, MySQL Server
+Need be installed NGINX, PHP, MySQL Server, Redis, Node
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+work_user: "user"
+work_domain: 
+work_dir: "work"
+project_git: 
+project_git_branch: 
+mysql_host: 
+mysql_admin_user: 
+mysql_admin_password:
+mysql_database: 
+mysql_db_user: 
+mysql_db_user_pass: 
+s3_key:
+s3_secret:
+s3_host:
+s3_bucket:
+s3_region:
 
 Dependencies
 ------------
@@ -21,11 +40,27 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - hosts: localhost
+      become: no
+      vars:
+        work_user: "user"
+        work_domain: 
+        work_dir: "work"
+        project_git: 
+        project_git_branch: 
+        mysql_host: 
+        mysql_admin_user: 
+        mysql_admin_password:
+        mysql_database: 
+        mysql_db_user: 
+        mysql_db_user_pass: 
+        s3_key:
+        s3_secret:
+        s3_host:
+        s3_bucket:
+        s3_region:
       roles:
-         - { role: tenantcloud.laravel, project_repo: "", project_path: "" }
+        - tenantcloud.laravel
 
 License
 -------

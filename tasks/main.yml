@@ -1,2 +1,5 @@
 ---
-# tasks file for laravel
+# tasks file for tenantcloud.laravel
+
+- import_tasks: macosx-setup-project.yml
+  when: ansible_distribution == "MacOSX"
