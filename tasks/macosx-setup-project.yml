@@ -26,7 +26,7 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   loop:
-    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^APP_URL=', line: 'APP_URL=http://{{ work_domain }}'}
+    - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}'}
     - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}'}
     - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_USERNAME=', line: 'DB_USERNAME={{ mysql_db_user }}'}
     - {path: '/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}/.env', regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD={{ mysql_db_user_pass }}'}
@@ -49,6 +49,7 @@
     login_user: "{{ mysql_admin_user }}"
     login_password: "{{ mysql_admin_password }}"
     name: "{{ mysql_database }}"
+    login_host: "{{ mysql_host }}"
     state: present
 
 - name: Create database user
@@ -57,7 +58,8 @@
     login_password: "{{ mysql_admin_password }}"
     name: "{{ mysql_db_user }}"
     password: "{{ mysql_db_user_pass }}"
-    priv: '{{ mysql_database }}.*:ALL'
+    host: "%"
+    priv: '{{ mysql_database }}.*:ALL,GRANT'
     state: present
 
 - name: Install nvm
