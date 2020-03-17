@@ -27,6 +27,7 @@ s3_secret:
 s3_host:
 s3_bucket:
 s3_region:
+package_manager:
 
 Dependencies
 ------------
@@ -55,7 +56,8 @@ Example Playbook
         s3_host: https://s3.endpoint
         s3_bucket: laravelbucket
         s3_region: us-east-1
-      remote_user: ubuntu
+        package_manager: "npm"
+      remote_user:
       roles:
         - tenantcloud.laravel
 

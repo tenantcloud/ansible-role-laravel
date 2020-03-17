@@ -59,12 +59,20 @@
     command: require
     working_dir: "/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}"
 
-- name: Run npm ci
+- name: Run npm install
   npm:
     ci: true
     path: "/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}"
   environment:
     PATH: "{{ lookup('env','PATH') }}"
+  when: package_manager|string() == "npm"
+
+- name: Run yarn install
+  yarn:
+    path: "/Users/{{ work_user }}/{{ work_dir }}/{{ work_domain }}"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  when: package_manager|string() == "yarn"
 
 - name: Copy nginx configured files
   template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
