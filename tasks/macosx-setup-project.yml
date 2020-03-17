@@ -1,12 +1,4 @@
 ---
-- name: Ensure bitbucket.org is a known host
-  lineinfile:
-    dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
-    create: true
-    state: present
-    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa bitbucket.org') }}"
-    regexp: "^bitbucket\\.org"
-
 - name: Clone laravel project
   git:
     repo: "{{ project_git }}"
@@ -61,38 +53,6 @@
     host: "%"
     priv: '{{ mysql_database }}.*:ALL,GRANT'
     state: present
-
-- name: Install nvm
-  shell: |
-    set -o pipefail
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/{{ nvm_version }}/install.sh | /bin/zsh
-    creates=/Users/{{ work_user }}/.nvm/nvm.sh
-  args:
-    warn: false
-  changed_when: false
-
-- name: Install node and set default version
-  shell: >
-    /bin/zsh -c "source ~/.nvm/nvm.sh && nvm install {{ node_version }} && nvm alias default {{ node_version }}"
-    creates=/Users/{{ work_user }}/.nvm/alias
-  changed_when: false
-
-- name: source zshrc
-  become: false
-  command: /bin/zsh -c "source ~/.zshrc"
-  changed_when: false
-
-- name: Create a symbolic link to npm
-  file:
-    src: /Users/{{ work_user }}/.nvm/versions/node/{{ nvm_node_version }}/bin/npm
-    dest: /usr/local/bin/npm
-    state: link
-
-- name: Create a symbolic link to node
-  file:
-    src: /Users/{{ work_user }}/.nvm/versions/node/{{ nvm_node_version }}/bin/node
-    dest: /usr/local/bin/node
-    state: link
 
 - name: Composer install
   composer:

@@ -1,22 +1,32 @@
 ---
 galaxy_info:
   role_name: laravel
-  author: Oleh Debretseni
-  description: Deploy laravel project
+  author: Viktor Fedkiv, Oleh Debretseni
+  description: Install laravel project on servers
   company: "TenantCloud LLC"
 
-  license: BSD
+  issue_tracker_url: https://github.com/tenantcloud/ansible-role-laravel/issues
 
-  min_ansible_version: 2.4
+  license: license (GPL-2.0-or-later, MIT, etc)
+
+  min_ansible_version: BSD
 
   platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+        - bionic
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
     - name: MacOSX
       versions:
         - 10.14
         - 10.15
 
   galaxy_tags:
-    - macos
-    - mac
     - laravel
-    - deploy
+
+dependencies: []
