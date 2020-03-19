@@ -25,6 +25,7 @@ s3_secret:
 s3_host:
 s3_bucket:
 s3_region:
+socket:
 
 Dependencies
 ------------
@@ -52,6 +53,7 @@ Example Playbook
     s3_host: https://s3.endpoint
     s3_bucket: laravelbucket
     s3_region: us-east-1
+    socket: true
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel

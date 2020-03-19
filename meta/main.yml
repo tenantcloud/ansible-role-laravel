@@ -1,7 +1,7 @@
 galaxy_info:
-  role_name: lavavel
+  role_name: laravel
   author: Igor Bronovskyi
-  description: Install Filebeat on testing servers
+  description: Setup Laravel project on servers
   company: "TenantCloud LLC"
 
   issue_tracker_url: https://github.com/tenantcloud/ansible-role-laravel/issues

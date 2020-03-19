@@ -1,16 +1,9 @@
 ---
-- name: Ensure bitbucket.org is a known host
-  lineinfile:
-    dest: "{{ ansible_env.HOME }}/.ssh/known_hosts"
-    create: yes
-    state: present
-    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa bitbucket.org') }}"
-    regexp: "^bitbucket\\.org"
-
 - name: Clone laravel project
   git:
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
+    accept_hostkey: true
 
 - name: Copy environment file
   copy:
@@ -18,7 +11,7 @@
     dest: "{{ work_dir }}/.env"
     remote_src: true
 
-- name: Change environment file
+- name: Seup environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
@@ -57,6 +50,12 @@
     password: "{{ mysql_db_user_pass }}"
     priv: '{{ mysql_database }}.*:ALL'
     state: present
+
+- name: Install composer plugin
+  composer:
+    command: require
+    global_command: yes
+    arguments: hirak/prestissimo
 
 - name: Composer install
   composer:
@@ -110,4 +109,3 @@
     dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
   notify: Restart Nginx
   become: true
-
