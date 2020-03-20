@@ -1,0 +1,83 @@
+---
+- name: Clone laravel project
+  git:
+    repo: "{{ project_git }}"
+    dest: "{{ work_dir }}"
+    version: "{{ project_git_branch }}"
+    force: true
+
+- name: Copy environment file
+  copy:
+    src: "{{ work_dir }}/.env.example"
+    dest: "{{ work_dir }}/.env"
+    remote_src: true
+
+- name: Change environment file
+  lineinfile:
+    path: "{{ item.path }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - {path: '{{ work_dir }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_USERNAME=', line: 'DB_USERNAME={{ mysql_db_user }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD={{ mysql_db_user_pass }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_DATABASE=', line: 'DB_DATABASE={{ mysql_database }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_KEY=', line: 'S3_KEY={{ s3_key }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_SECRET_KEY=', line: 'S3_SECRET_KEY={{ s3_secret }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_AWS_URL=', line: 'S3_AWS_URL={{ s3_host }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
+
+- name: Install PyMySQL
+  pip:
+    name: pymysql
+    executable: /usr/local/bin/pip3
+  become: true
+
+- name: Create database
+  mysql_db:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_database }}"
+    login_host: "{{ mysql_host }}"
+    state: present
+
+- name: Create database user
+  mysql_user:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_db_user }}"
+    password: "{{ mysql_db_user_pass }}"
+    host: "%"
+    priv: '{{ mysql_database }}.*:ALL,GRANT'
+    state: present
+
+- name: Composer install
+  composer:
+    command: require
+    working_dir: "{{ work_dir }}"
+
+- name: Run npm install
+  npm:
+    ci: true
+    path: "{{ work_dir }}"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  when: package_manager|string() == "npm"
+
+- name: Run yarn install
+  yarn:
+    path: "{{ work_dir }}"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  when: package_manager|string() == "yarn"
+
+- name: Copy nginx configured files
+  template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
+
+- name: Restart nginx
+  become: true
+  command: /usr/local/bin/brew services restart nginx
+  changed_when: false
