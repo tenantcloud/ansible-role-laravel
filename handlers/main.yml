@@ -6,3 +6,8 @@
   service:
     name: nginx
     state: restarted
+
+- name: Brew restart nginx
+  become: true
+  command: /usr/local/bin/brew services restart nginx
+  changed_when: false

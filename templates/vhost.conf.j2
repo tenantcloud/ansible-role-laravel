@@ -27,8 +27,8 @@ server {
     location = /favicon.ico { access_log off; log_not_found off; }
     location = /robots.txt  { access_log off; log_not_found off; }
 
-    access_log /usr/local/var/log/nginx/{{ work_domain }}.access.log;
-    error_log  /usr/local/var/log/nginx/{{ work_domain }}.error.log;
+    access_log /usr/local/var/log/nginx/{{ work_domain }}-access.log;
+    error_log  /usr/local/var/log/nginx/{{ work_domain }}-error.log;
 
     location ~ \.php$ {
         try_files      $uri = 404;

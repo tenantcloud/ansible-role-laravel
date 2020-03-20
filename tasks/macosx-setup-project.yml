@@ -4,7 +4,7 @@
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
     version: "{{ project_git_branch }}"
-    force: true
+    accept_hostkey: true
 
 - name: Copy environment file
   copy:
@@ -34,7 +34,6 @@
   pip:
     name: pymysql
     executable: /usr/local/bin/pip3
-  become: true
 
 - name: Create database
   mysql_db:
@@ -76,8 +75,5 @@
 
 - name: Copy nginx configured files
   template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
-
-- name: Restart nginx
+  notify: Brew restart nginx
   become: true
-  command: /usr/local/bin/brew services restart nginx
-  changed_when: false

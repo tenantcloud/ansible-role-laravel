@@ -13,7 +13,6 @@ Role Variables
 
 work_domain:
 work_dir:
-work_user:
 project_git:
 project_git_branch:
 mysql_host:
@@ -44,7 +43,6 @@ Example Playbook
   vars:
     work_domain: laravel.dev
     work_dir: /var/www/html/laravel
-    work_user: user
     project_git: git@bitbucket.org:mycompany/laravel.git
     project_git_branch: master
     mysql_host: 127.0.0.1
