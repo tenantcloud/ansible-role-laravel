@@ -8,9 +8,6 @@ Requirements
 
 Need be installed NGINX, PHP, MySQL Server, Redis, Node
 
-Role Variables
---------------
-
 work_domain:
 work_dir:
 work_user:
@@ -37,30 +34,29 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 
 Example Playbook
 ----------------
-    - name: Setup
-      hosts: localhost
-      vars:
-        work_domain: laravel.dev
-        work_dir: /var/www/html/laravel
-        work_user: "user"
-        project_git: git@bitbucket.org:mycompany/laravel.git
-        project_git_branch: 
-        mysql_host: 127.0.0.1
-        mysql_admin_user: root 
-        mysql_admin_password: rootpassword
-        mysql_db_user: userdb
-        mysql_db_user_pass: userdbpassword
-        mysql_database: laraveldb 
-        s3_key: accesskey
-        s3_secret: secretkey
-        s3_host: https://s3.endpoint
-        s3_bucket: laravelbucket
-        s3_region: us-east-1
-        socket: true
-        package_manager: "npm"
-      remote_user:
-      roles:
-        - tenantcloud.laravel
+
+- name: Setup
+  hosts: localhost
+  vars:
+    work_domain: laravel.dev
+    work_dir: /var/www/html/laravel
+    project_git: git@bitbucket.org:mycompany/laravel.git
+    mysql_host: 127.0.0.1
+    mysql_admin_user: root
+    mysql_admin_password: rootpassword
+    mysql_db_user: userdb
+    mysql_db_user_pass: userdbpassword
+    mysql_database: laraveldb
+    s3_key: accesskey
+    s3_secret: secretkey
+    s3_host: https://s3.endpoint
+    s3_bucket: laravelbucket
+    s3_region: us-east-1
+    socket: true
+    package_manager: npm
+  remote_user: ubuntu
+  roles:
+    - tenantcloud.laravel
 
 License
 -------
