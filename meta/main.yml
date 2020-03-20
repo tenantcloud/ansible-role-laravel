@@ -1,8 +1,7 @@
----
 galaxy_info:
   role_name: laravel
-  author: Viktor Fedkiv, Oleh Debretseni
-  description: Install laravel project on servers
+  author: Igor Bronovskyi
+  description: Setup Laravel project on servers
   company: "TenantCloud LLC"
 
   issue_tracker_url: https://github.com/tenantcloud/ansible-role-laravel/issues

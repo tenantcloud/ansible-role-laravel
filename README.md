@@ -37,9 +37,8 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 
 Example Playbook
 ----------------
-
-    - hosts: localhost
-      become: no
+    - name: Setup
+      hosts: localhost
       vars:
         work_domain: laravel.dev
         work_dir: /var/www/html/laravel
