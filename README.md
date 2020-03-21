@@ -6,7 +6,7 @@ The role will enable rapid deployment of project Laravel
 Requirements
 ------------
 
-Need be installed NGINX, PHP, MySQL Server
+Need be installed NGINX, PHP, MySQL Server, Redis, Node
 
 Role Variables
 --------------
@@ -14,6 +14,7 @@ Role Variables
 work_domain:
 work_dir:
 project_git:
+project_git_branch:
 mysql_host:
 mysql_admin_user:
 mysql_admin_password: 
@@ -26,6 +27,7 @@ s3_host:
 s3_bucket:
 s3_region:
 socket:
+package_manager:
 
 Dependencies
 ------------
@@ -42,6 +44,7 @@ Example Playbook
     work_domain: laravel.dev
     work_dir: /var/www/html/laravel
     project_git: git@bitbucket.org:mycompany/laravel.git
+    project_git_branch: master
     mysql_host: 127.0.0.1
     mysql_admin_user: root
     mysql_admin_password: rootpassword
@@ -54,6 +57,7 @@ Example Playbook
     s3_bucket: laravelbucket
     s3_region: us-east-1
     socket: true
+    package_manager: npm
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel

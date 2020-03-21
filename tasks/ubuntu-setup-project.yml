@@ -3,6 +3,7 @@
   git:
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
+    version: "{{ project_git_branch }}"
     accept_hostkey: true
 
 - name: Copy environment file
@@ -11,7 +12,7 @@
     dest: "{{ work_dir }}/.env"
     remote_src: true
 
-- name: Seup environment file
+- name: Change environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
@@ -105,7 +106,7 @@
 
 - name: Copy nginx config file
   template:
-    src: "nginx.conf.j2"
+    src: "vhost.conf.j2"
     dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
   notify: Restart Nginx
   become: true
