@@ -1,0 +1,11 @@
+[program:horizon]
+directory={{ work_dir }}
+command=php artisan horizon
+
+process_name=%(program_name)s_%(process_num)02d
+autostart=true
+autorestart=true
+user={{ ansible_user }}
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/log/horizon-{{ work_domain }}.log

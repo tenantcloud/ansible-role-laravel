@@ -3,8 +3,16 @@
   git:
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
-    version: "{{ project_git_branch }}"
     accept_hostkey: true
+  become: true
+
+- name: Change permissions
+  file:
+    path: "{{ work_dir }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    recurse: true
+  become: true
 
 - name: Copy environment file
   copy:
@@ -12,7 +20,7 @@
     dest: "{{ work_dir }}/.env"
     remote_src: true
 
-- name: Change environment file
+- name: Seup environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
@@ -110,3 +118,15 @@
     dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
   notify: Restart Nginx
   become: true
+
+- include: ubuntu-setup-supervisor.yml
+  when: "horizon == 'true' or mailcatcher == 'true'"
+
+- name: Add schedule cron job
+  cron:
+    cron_file: "/etc/crontab"
+    name: "schedule cron job"
+    user: "{{ ansible_user }}"
+    job: "/usr/bin/php {{ work_dir }}/artisan schedule:run > /home/{{ ansible_user }}/.log/scheduled-{{ work_domain }}.log 2>&1"
+  become: true
+  when: "schedule == 'true'"

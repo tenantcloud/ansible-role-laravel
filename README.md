@@ -27,6 +27,9 @@ s3_host:
 s3_bucket:
 s3_region:
 socket:
+horizon:
+mailcatcher:
+schedule:
 package_manager:
 
 Dependencies
@@ -41,23 +44,26 @@ Example Playbook
 - name: Setup
   hosts: localhost
   vars:
-    work_domain: laravel.dev
-    work_dir: /var/www/html/laravel
-    project_git: git@bitbucket.org:mycompany/laravel.git
-    project_git_branch: master
-    mysql_host: 127.0.0.1
-    mysql_admin_user: root
-    mysql_admin_password: rootpassword
-    mysql_db_user: userdb
-    mysql_db_user_pass: userdbpassword
-    mysql_database: laraveldb
-    s3_key: accesskey
-    s3_secret: secretkey
-    s3_host: https://s3.endpoint
-    s3_bucket: laravelbucket
-    s3_region: us-east-1
-    socket: true
-    package_manager: npm
+    work_domain: 'laravel.dev'
+    work_dir: '/var/www/html/laravel'
+    project_git: 'git@bitbucket.org:mycompany/laravel.git'
+    project_git_branch: 'master'
+    mysql_host: '127.0.0.1'
+    mysql_admin_user: 'root'
+    mysql_admin_password: 'rootpassword'
+    mysql_db_user: 'userdb'
+    mysql_db_user_pass: 'userdbpassword'
+    mysql_database: 'laraveldb'
+    s3_key: 'accesskey'
+    s3_secret: 'secretkey'
+    s3_host: 'https://s3.endpoint'
+    s3_bucket: 'laravelbucket'
+    s3_region: 'us-east-1'
+    socket: 'true'
+    horizon: 'true'
+    mailcatcher: 'true'
+    schedule: 'true'
+    package_manager: 'npm'
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel
