@@ -1,43 +1,20 @@
+- include: ubuntu-setup-horizon.yml
+  when: horizon == 'true'
+
+- include: ubuntu-setup-mailcatcher.yml
+  when: mailcatcher == 'true'
+
 - name: Ensure supervisor installed
   apt:
     name: supervisor
     update_cache: yes
     cache_valid_time: 86400
   become: true
+  register: supervisor_installed
 
 - name: Copy supervisor config
   template:
-    src: "supervisord.conf.j2"
-    dest: "/etc/supervisor/supervisord.conf"
+    src: "supervisord-ubuntu.conf.j2"
+    dest: "/etc/supervisor/supervisord1.conf"
   become: true
-
-- name: Copy horizon config
-  template:
-    src: "horizon.conf.j2"
-    dest: "/etc/supervisor/conf.d/horizon.conf"
-  become: true
-  when: "horizon == 'true'"
-  notify: Restart Supervisor
-
-- name: Ensure ruby installed for mailcatcher
-  apt:
-    name: ruby-full
-    update_cache: yes
-    cache_valid_time: 86400
-  become: true
-  when: "mailcatcher == 'true'"
-
-- name: Install mailcatcher
-  gem:
-    name: mailcatcher
-    state: present
-  become: true
-  when: "mailcatcher == 'true'"
-
-- name: Copy mailcatcher config
-  template:
-    src: "mailcatcher.conf.j2"
-    dest: "/etc/supervisor/conf.d/mailcatcher.conf"
-  become: true
-  when: "mailcatcher == 'true'"
-  notify: Restart Supervisor
+  when: supervisor_installed.changed

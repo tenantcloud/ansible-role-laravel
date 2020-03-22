@@ -1,0 +1,8 @@
+[program:mailcatcher]
+command=/usr/local/bin/mailcatcher --no-quit --foreground
+
+autostart=true
+autorestart=true
+user={{ ansible_user }}
+numprocs=1
+stdout_logfile={{ ansible_env.HOME }}/.log/mailcatcher-{{ work_domain }}.log

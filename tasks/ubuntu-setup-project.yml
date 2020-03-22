@@ -20,7 +20,7 @@
     dest: "{{ work_dir }}/.env"
     remote_src: true
 
-- name: Seup environment file
+- name: Setup environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
@@ -120,13 +120,21 @@
   become: true
 
 - include: ubuntu-setup-supervisor.yml
-  when: "horizon == 'true' or mailcatcher == 'true'"
+  when: horizon == 'true' or mailcatcher == 'true'
 
 - name: Add schedule cron job
   cron:
     cron_file: "/etc/crontab"
     name: "schedule cron job"
     user: "{{ ansible_user }}"
-    job: "/usr/bin/php {{ work_dir }}/artisan schedule:run > /home/{{ ansible_user }}/.log/scheduled-{{ work_domain }}.log 2>&1"
+    job: "/usr/bin/php {{ work_dir }}/artisan schedule:run > {{ ansible_env.HOME }}/.log/scheduled-{{ work_domain }}.log 2>&1"
   become: true
-  when: "schedule == 'true'"
+  when: schedule == 'true'
+  register: schedule_added
+
+- name: Create log directory
+  file:
+    path: "{{ ansible_env.HOME }}/.log1"
+    state: directory
+    mode: "0755"
+  when: schedule_added.changed
