@@ -77,3 +77,5 @@
   template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
   notify: Brew restart nginx
   become: true
+
+- include: macosx-setup-supervisor.yml

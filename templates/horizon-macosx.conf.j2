@@ -1,0 +1,8 @@
+[program:{{ work_domain }}-horizon]
+process_name=%(program_name)s_%(process_num)02d
+command=/usr/local/bin/php {{ work_dir }}/artisan horizon
+autostart=true
+autorestart=true
+user={{ ansible_user }}
+redirect_stderr=true
+stdout_logfile=/usr/local/var/log/supervisor-horizon-{{ work_domain }}.log

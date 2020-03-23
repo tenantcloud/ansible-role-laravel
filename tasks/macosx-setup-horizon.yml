@@ -1,0 +1,5 @@
+---
+- name: Copy horizon config
+  template: src=horizon-macosx.conf.j2 dest=/usr/local/etc/supervisor.d/{{ work_domain }}-horizon.ini
+  notify: Brew restart supervisor
+  when: horizon
