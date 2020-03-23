@@ -120,7 +120,6 @@
   become: true
 
 - include: ubuntu-setup-supervisor.yml
-  when: horizon == 'true' or mailcatcher == 'true'
 
 - name: Add schedule cron job
   cron:
@@ -138,3 +137,6 @@
     state: directory
     mode: "0755"
   when: schedule_added.changed
+
+- include: ubuntu-setup-docker.yml
+  when: docker == 'true'

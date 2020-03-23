@@ -1,3 +1,4 @@
+---
 - name: Copy horizon config
   template:
     src: "horizon-ubuntu.conf.j2"

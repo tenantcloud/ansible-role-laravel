@@ -1,0 +1,89 @@
+---
+- name: Ensure docker dependencies are installed
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg2
+    state: present
+  become: true
+
+- name: Add Docker apt key
+  apt_key:
+    url: "{{ docker_apt_gpg_key }}"
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    state: present
+  register: add_repository_key
+  ignore_errors: true
+  become: true
+
+- name: Add Docker repository
+  apt_repository:
+    repo: "{{ docker_apt_repository }}"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install Docker
+  package:
+    name: "{{ docker_package }}"
+    state: present
+  notify: Restart Docker
+  become: true
+
+- name: Ensure Docker is started and enabled at boot
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Install Docker Compose
+  get_url:
+    url: "{{ docker_compose_url }}"
+    dest: "{{ docker_compose_path }}"
+    mode: 0777
+  become: true
+
+- name: Ensure docker users are added to the docker group.
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: true
+  become: true
+
+- name: Install awscli
+  pip:
+    name: "{{ item }}"
+  become: true
+  loop:
+    - awscli
+    - docker
+    - docker-compose
+
+- name: Create docker ecr config directories
+  file:
+    path: "{{ ansible_env.HOME }}/.aws"
+    state: directory
+    mode: 0775
+
+- name: Copy docker aws credentials
+  template:
+    src: "ecr-{{ item }}.j2"
+    dest: "{{ ansible_env.HOME }}/.aws/{{ item }}"
+  loop:
+    - "credentials"
+    - "config"
+
+- name: Docker login
+  shell: "$(aws ecr get-login --profile ecr --no-include-email --region {{ aws_ecr_region }})"
+
+- name: Prepare config for pull image from AWS ECR
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "/tmp/docker-compose.yml"
+
+- name: Pull images from AWS ECR
+  docker_compose:
+    project_src: "/tmp"
+    pull: true
+    stopped: true

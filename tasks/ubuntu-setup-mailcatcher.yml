@@ -1,3 +1,4 @@
+---
 - name: Ensure ruby installed for mailcatcher
   apt:
     name: ruby-full
