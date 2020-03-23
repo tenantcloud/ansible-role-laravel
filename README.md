@@ -31,11 +31,6 @@ horizon:
 mailcatcher:
 schedule:
 package_manager:
-docker:
-aws_ecr_access_key:
-aws_ecr_secret_key:
-aws_ecr_region:
-aws_ecr_registry:
 
 Dependencies
 ------------
@@ -69,11 +64,6 @@ Example Playbook
     mailcatcher: 'true'
     schedule: 'true'
     package_manager: 'npm'
-    docker: 'true'
-    aws_ecr_access_key: 'ecraccesskey'
-    aws_ecr_secret_key: 'ecrsecretkey'
-    aws_ecr_region: 'us-east-1'
-    aws_ecr_registry: '1234567890.dkr.ecr.us-east-1.amazonaws.com'
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel

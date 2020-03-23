@@ -121,15 +121,15 @@
 
 - include: ubuntu-setup-supervisor.yml
 
-- name: Add schedule cron job
-  cron:
-    cron_file: "/etc/crontab"
-    name: "schedule cron job"
-    user: "{{ ansible_user }}"
-    job: "/usr/bin/php {{ work_dir }}/artisan schedule:run > {{ ansible_env.HOME }}/.log/scheduled-{{ work_domain }}.log 2>&1"
-  become: true
-  when: schedule == 'true'
-  register: schedule_added
+# - name: Add schedule cron job
+#   cron:
+#     cron_file: "/etc/crontab"
+#     name: "schedule cron job"
+#     user: "{{ ansible_user }}"
+#     job: "/usr/bin/php {{ work_dir }}/artisan schedule:run > {{ ansible_env.HOME }}/.log/scheduled-{{ work_domain }}.log 2>&1"
+#   become: true
+#   when: schedule == 'true'
+#   register: schedule_added
 
 - name: Create log directory
   file:
@@ -137,6 +137,3 @@
     state: directory
     mode: "0755"
   when: schedule_added.changed
-
-- include: ubuntu-setup-docker.yml
-  when: docker == 'true'
