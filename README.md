@@ -28,10 +28,7 @@ s3_host:
 s3_bucket:
 s3_region:
 socket:
-horizon:
-mailcatcher:
 schedule:
-package_manager:
 
 Dependencies
 ------------
@@ -62,10 +59,7 @@ Example Playbook
     s3_bucket: 'laravelbucket'
     s3_region: 'us-east-1'
     socket: 'true'
-    horizon: 'true'
-    mailcatcher: 'true'
     schedule: 'true'
-    package_manager: 'npm'
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel

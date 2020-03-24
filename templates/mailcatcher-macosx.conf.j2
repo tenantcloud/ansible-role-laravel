@@ -1,8 +1,0 @@
-[program:{{ work_domain }}-mailcatcher]
-process_name=%(program_name)s_%(process_num)02d
-command=/usr/local/bin/mailcatcher & --no-quit --foreground
-autostart=true
-autorestart=true
-user={{ ansible_user }}
-redirect_stderr=true
-stdout_logfile=/usr/local/var/log/supervisor-mailcatcher-{{ work_domain }}.log
