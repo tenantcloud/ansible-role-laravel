@@ -52,17 +52,6 @@
     priv: '{{ mysql_database }}.*:ALL'
     state: present
 
-- name: Install composer plugin
-  composer:
-    command: require
-    global_command: true
-    arguments: hirak/prestissimo
-
-- name: Composer install
-  composer:
-    command: require
-    working_dir: "{{ work_dir }}"
-
 - name: Ensure Nodejs dependencies are present.
   apt:
     name:
@@ -99,33 +88,9 @@
     state: present
   become: true
 
-- name: Run npm ci
-  npm:
-    ci: true
-    path: "{{ work_dir }}"
-
 - name: Copy nginx config file
   template:
     src: "vhost.conf.j2"
     dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
   notify: Restart Nginx
   become: true
-
-- include: ubuntu-setup-supervisor.yml
-
-# - name: Add schedule cron job
-#   cron:
-#     cron_file: "/etc/crontab"
-#     name: "schedule cron job"
-#     user: "{{ ansible_user }}"
-#     job: "/usr/bin/php {{ work_dir }}/artisan schedule:run > {{ ansible_env.HOME }}/.log/scheduled-{{ work_domain }}.log 2>&1"
-#   become: true
-#   when: schedule == 'true'
-#   register: schedule_added
-
-- name: Create log directory
-  file:
-    path: "{{ ansible_env.HOME }}/.log1"
-    state: directory
-    mode: "0755"
-  when: schedule_added.changed
