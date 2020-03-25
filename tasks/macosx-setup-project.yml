@@ -55,5 +55,13 @@
 
 - name: Copy nginx configured files
   template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
+
+- name: Run deploy script
+  command: $HOME/{{ work_dir }}/sh/install.sh
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
   notify: Brew restart nginx
-  become: true
+  changed_when: false
+
+- name: Restart Supervisor
+  notify: Brew restart supervisor

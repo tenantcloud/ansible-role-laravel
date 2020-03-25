@@ -45,7 +45,7 @@ Example Playbook
     ansible_user: 'ubuntu'
     work_domain: 'laravel.dev'
     work_dir: '/var/www/html/laravel'
-    project_git: 'git@bitbucket.org:mycompany/laravel.git'
+    project_git: 'git@github.com:tenantcloud/laravel-demo-project.git'
     project_git_branch: 'master'
     mysql_host: '127.0.0.1'
     mysql_admin_user: 'root'
