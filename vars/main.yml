@@ -1,4 +1,2 @@
 ---
 # vars file for laravel
-
-ansible_python_interpreter: "/usr/local/bin/python3"
