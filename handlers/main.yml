@@ -11,3 +11,13 @@
   become: true
   command: /usr/local/bin/brew services restart nginx
   changed_when: false
+
+- name: Restart Supervisor
+  become: true
+  service:
+    name: supervisor
+    state: restarted
+
+- name: Brew restart supervisor
+  command: /usr/local/bin/brew services restart supervisor
+  changed_when: false

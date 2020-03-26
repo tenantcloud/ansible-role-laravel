@@ -53,27 +53,15 @@
     priv: '{{ mysql_database }}.*:ALL,GRANT'
     state: present
 
-- name: Composer install
-  composer:
-    command: require
-    working_dir: "{{ work_dir }}"
-
-- name: Run npm install
-  npm:
-    ci: true
-    path: "{{ work_dir }}"
-  environment:
-    PATH: "{{ lookup('env','PATH') }}"
-  when: package_manager|string() == "npm"
-
-- name: Run yarn install
-  yarn:
-    path: "{{ work_dir }}"
-  environment:
-    PATH: "{{ lookup('env','PATH') }}"
-  when: package_manager|string() == "yarn"
-
 - name: Copy nginx configured files
   template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
+
+- name: Run deploy script
+  command: $HOME/{{ work_dir }}/sh/install.sh
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
   notify: Brew restart nginx
-  become: true
+  changed_when: false
+
+- name: Restart Supervisor
+  notify: Brew restart supervisor
