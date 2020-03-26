@@ -62,6 +62,3 @@
     PATH: "{{ lookup('env','PATH') }}"
   notify: Brew restart nginx
   changed_when: false
-
-- name: Restart Supervisor
-  notify: Brew restart supervisor
