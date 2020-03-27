@@ -1,8 +1,0 @@
----
-- name: Copy horizon config
-  template:
-    src: "horizon-ubuntu.conf.j2"
-    dest: "/etc/supervisor/conf.d/horizon.conf"
-  become: true
-  when: "horizon == 'true'"
-  notify: Restart Supervisor
