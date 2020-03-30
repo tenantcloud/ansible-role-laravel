@@ -66,6 +66,7 @@ Example Playbook
   roles:
     - tenantcloud.laravel
 ```
+work_dir: '/var/www/html/laravel' for linux or 'work' for macosx 
 
 License
 -------
