@@ -29,6 +29,8 @@ s3_bucket:
 s3_region:
 socket:
 schedule:
+pm2:
+app_env:
 
 Dependencies
 ------------
@@ -60,6 +62,8 @@ Example Playbook
     s3_region: 'us-east-1'
     socket: 'true'
     schedule: 'true'
+    pm2: 'true'
+    app_env: 'production'
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel
