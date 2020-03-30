@@ -1,6 +1,6 @@
 ---
 - name: Set work_dir
-  set_fact: work_dir=$HOME/{{ work_dir }}/{{ work_domain }}
+  set_fact: work_dir={{ ansible_env.HOME }}/{{ work_dir }}/{{ work_domain }}
 
 - name: Clone laravel project
   git:
