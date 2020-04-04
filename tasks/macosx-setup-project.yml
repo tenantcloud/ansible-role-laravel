@@ -9,11 +9,17 @@
     version: "{{ project_git_branch }}"
     accept_hostkey: true
 
+- name: Get environment file exist status
+  stat:
+    path: "{{ work_dir }}/.env.example"
+  register: file
+
 - name: Copy environment file
   copy:
     src: "{{ work_dir }}/.env.example"
     dest: "{{ work_dir }}/.env"
     remote_src: true
+  when: file.stat.exists
 
 - name: Change environment file
   lineinfile:
@@ -33,6 +39,7 @@
     - {path: '{{ work_dir }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
+  when: file.stat.exists
 
 - name: Install PyMySQL
   pip:
