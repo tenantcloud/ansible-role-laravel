@@ -124,4 +124,3 @@
     path: "{{ ansible_env.HOME }}/.log"
     state: directory
     mode: "0755"
-  when: schedule_added.changed
