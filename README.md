@@ -11,6 +11,7 @@ Need be installed NGINX, PHP, MySQL Server, Redis, Node
 Role Variables
 --------------
 
+ansible_user:
 work_domain:
 work_dir:
 project_git:
@@ -27,10 +28,7 @@ s3_host:
 s3_bucket:
 s3_region:
 socket:
-horizon:
-mailcatcher:
 schedule:
-package_manager:
 
 Dependencies
 ------------
@@ -44,9 +42,10 @@ Example Playbook
 - name: Setup
   hosts: localhost
   vars:
+    ansible_user: 'ubuntu'
     work_domain: 'laravel.dev'
     work_dir: '/var/www/html/laravel'
-    project_git: 'https://github.com/tenantcloud/laravel-demo-project'
+    project_git: 'git@github.com:tenantcloud/laravel-demo-project.git'
     project_git_branch: 'master'
     mysql_host: '127.0.0.1'
     mysql_admin_user: 'root'
@@ -60,10 +59,7 @@ Example Playbook
     s3_bucket: 'laravelbucket'
     s3_region: 'us-east-1'
     socket: 'true'
-    horizon: 'true'
-    mailcatcher: 'true'
     schedule: 'true'
-    package_manager: 'npm'
   remote_user: ubuntu
   roles:
     - tenantcloud.laravel

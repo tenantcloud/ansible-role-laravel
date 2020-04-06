@@ -17,3 +17,7 @@
   service:
     name: supervisor
     state: restarted
+
+- name: Brew restart supervisor
+  command: /usr/local/bin/brew services restart supervisor
+  changed_when: false
