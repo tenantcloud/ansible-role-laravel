@@ -3,6 +3,7 @@
   git:
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
+    version: "{{ project_git_branch }}"
     accept_hostkey: true
   become: true
 
@@ -108,4 +109,3 @@
     path: "{{ ansible_env.HOME }}/.log"
     state: directory
     mode: "0755"
-  when: schedule_added.changed
