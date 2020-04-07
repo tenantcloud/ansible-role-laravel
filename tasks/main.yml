@@ -1,2 +1,8 @@
 ---
 # tasks file for laravel
+
+- import_tasks: ubuntu-setup-project.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- import_tasks: macosx-setup-project.yml
+  when: ansible_distribution == "MacOSX"

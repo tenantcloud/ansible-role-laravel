@@ -6,12 +6,30 @@ The role will enable rapid deployment of project Laravel
 Requirements
 ------------
 
-Need be installed NGINX, PHP, MySQL Server
+Need be installed NGINX, PHP, MySQL Server, Redis, Node
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+ansible_user:
+work_domain:
+work_dir:
+project_git:
+project_git_branch:
+mysql_host:
+mysql_admin_user:
+mysql_admin_password: 
+mysql_db_user:
+mysql_db_user_pass:
+mysql_database:
+s3_key:
+s3_secret:
+s3_host:
+s3_bucket:
+s3_region:
+socket:
+schedule:
+app_env:
 
 Dependencies
 ------------
@@ -21,11 +39,34 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: localhost
-      roles:
-         - { role: tenantcloud.laravel, project_repo: "", project_path: "" }
+```yaml
+- name: Setup
+  hosts: localhost
+  vars:
+    ansible_user: 'ubuntu'
+    work_domain: 'laravel.dev'
+    work_dir: '/var/www/html/laravel'
+    project_git: 'git@github.com:tenantcloud/laravel-demo-project.git'
+    project_git_branch: 'master'
+    mysql_host: '127.0.0.1'
+    mysql_admin_user: 'root'
+    mysql_admin_password: 'rootpassword'
+    mysql_db_user: 'userdb'
+    mysql_db_user_pass: 'userdbpassword'
+    mysql_database: 'laraveldb'
+    s3_key: 'accesskey'
+    s3_secret: 'secretkey'
+    s3_host: 'https://s3.endpoint'
+    s3_bucket: 'laravelbucket'
+    s3_region: 'us-east-1'
+    socket: 'true'
+    schedule: 'true'
+    app_env: 'production'
+  remote_user: ubuntu
+  roles:
+    - tenantcloud.laravel
+```
+work_dir: '/var/www/html/laravel' for linux or 'work' for macosx 
 
 License
 -------

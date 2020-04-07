@@ -1,0 +1,75 @@
+---
+- name: Set work_dir
+  set_fact: work_dir={{ ansible_env.HOME }}/{{ work_dir }}/{{ work_domain }}
+
+- name: Clone laravel project
+  git:
+    repo: "{{ project_git }}"
+    dest: "{{ work_dir }}"
+    version: "{{ project_git_branch }}"
+    accept_hostkey: true
+
+- name: Get environment file exist status
+  stat:
+    path: "{{ work_dir }}/.env.example"
+  register: file
+
+- name: Copy environment file
+  copy:
+    src: "{{ work_dir }}/.env.example"
+    dest: "{{ work_dir }}/.env"
+    remote_src: true
+  when: file.stat.exists
+
+- name: Change environment file
+  lineinfile:
+    path: "{{ item.path }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - {path: '{{ work_dir }}/.env', regexp: '^APP_ENV=', line: 'APP_ENV={{ app_env }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_USERNAME=', line: 'DB_USERNAME={{ mysql_db_user }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD={{ mysql_db_user_pass }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DB_DATABASE=', line: 'DB_DATABASE={{ mysql_database }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_KEY=', line: 'S3_KEY={{ s3_key }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_SECRET_KEY=', line: 'S3_SECRET_KEY={{ s3_secret }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_AWS_URL=', line: 'S3_AWS_URL={{ s3_host }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
+  when: file.stat.exists
+
+- name: Install PyMySQL
+  pip:
+    name: pymysql
+    executable: /usr/local/bin/pip3
+
+- name: Create database
+  mysql_db:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_database }}"
+    login_host: "{{ mysql_host }}"
+    state: present
+
+- name: Create database user
+  mysql_user:
+    login_user: "{{ mysql_admin_user }}"
+    login_password: "{{ mysql_admin_password }}"
+    name: "{{ mysql_db_user }}"
+    password: "{{ mysql_db_user_pass }}"
+    host: "%"
+    priv: '{{ mysql_database }}.*:ALL,GRANT'
+    state: present
+
+- name: Copy nginx configured files
+  template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
+
+- name: Run deploy script
+  command: "{{ work_dir }}/sh/install.sh"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  notify: Brew restart nginx
+  changed_when: false

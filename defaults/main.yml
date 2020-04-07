@@ -1,2 +1,8 @@
 ---
 # defaults file for laravel
+
+nodejs_version: "10.x"
+socket: "false"
+horizon: "false"
+mailcatcher: "false"
+schedule: "false"
