@@ -3,6 +3,7 @@
   git:
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
+    version: "{{ project_git_branch }}"
     accept_hostkey: true
   become: true
 
