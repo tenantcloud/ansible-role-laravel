@@ -1,6 +1,6 @@
 
-<img src="https://github.com/tenantcloud/ansible-role-laravel/workflows/Ansible Lint/badge.svg?branch-master" alt="">
-<img src="https://github.com/tenantcloud/ansible-role-laravel/workflows/Yaml Lint/badge.svg?branch-master" alt="">
+![Ansible Lint](https://github.com/tenantcloud/ansible-role-laravel/workflows/Ansible%20Lint/badge.svg?branch-master)
+![Yaml Lint](https://github.com/tenantcloud/ansible-role-laravel/workflows/Yaml%20Lint/badge.svg?branch-master)
 
 TenantCloud Laravel Role
 =========
@@ -73,7 +73,10 @@ Example Playbook
   roles:
     - tenantcloud.laravel
 ```
-work_dir: '/var/www/html/laravel' for linux or 'work' for macosx 
+
+```yaml
+    work_dir: '/var/www/html/laravel' for linux or 'work' for macosx
+``` 
 
 License
 -------
