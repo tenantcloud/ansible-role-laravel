@@ -1,3 +1,7 @@
+
+<img src="https://github.com/tenantcloud/ansible-role-laravel/workflows/Ansible Lint/badge.svg?branch-master" alt="">
+<img src="https://github.com/tenantcloud/ansible-role-laravel/workflows/Yaml Lint/badge.svg?branch-master" alt="">
+
 TenantCloud Laravel Role
 =========
 
@@ -30,6 +34,9 @@ s3_region:
 socket:
 schedule:
 app_env:
+node_apt_key:
+node_source_repo_1:
+node_source_repo_2:
 
 Dependencies
 ------------
