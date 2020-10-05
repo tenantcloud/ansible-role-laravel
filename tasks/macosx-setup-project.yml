@@ -18,14 +18,17 @@
   copy:
     src: "{{ work_dir }}/.env.example"
     dest: "{{ work_dir }}/.env"
+    mode: 0644
     remote_src: true
   when: file.stat.exists
 
+# yamllint disable
 - name: Change environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
+    mode: 0644
   loop:
     - {path: '{{ work_dir }}/.env', regexp: '^APP_ENV=', line: 'APP_ENV={{ app_env }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}'}
@@ -40,6 +43,7 @@
     - {path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
   when: file.stat.exists
+# yamllint enable
 
 - name: Install PyMySQL
   pip:
@@ -65,7 +69,11 @@
     state: present
 
 - name: Copy nginx configured files
-  template: src=vhost.conf.j2 dest=/usr/local/etc/nginx/servers/{{ work_domain }}.conf
+  copy:
+    src: vhost.conf.j2
+    dest: /usr/local/etc/nginx/servers/{{ work_domain }}.conf
+    mode: 0644
+    remote_src: true
 
 - name: Run deploy script
   command: "{{ work_dir }}/sh/install.sh"
