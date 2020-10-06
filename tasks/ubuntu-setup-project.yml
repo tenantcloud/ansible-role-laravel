@@ -13,19 +13,23 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     recurse: true
+    mode: 0644
   become: true
 
 - name: Copy environment file
   copy:
     src: "{{ work_dir }}/.env.example"
     dest: "{{ work_dir }}/.env"
+    mode: 0644
     remote_src: true
 
+# yamllint disable
 - name: Setup environment file
   lineinfile:
     path: "{{ item.path }}"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
+    mode: 0644
   loop:
     - {path: '{{ work_dir }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}'}
@@ -38,6 +42,7 @@
     - {path: '{{ work_dir }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
     - {path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
+# yamllint enable
 
 - name: Install PyMySQL
   pip:
@@ -71,7 +76,7 @@
 
 - name: Add NodeSource apt key.
   apt_key:
-    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+    url: "{{ node_apt_key }}"
     id: "68576280"
     state: present
   become: true
@@ -81,14 +86,16 @@
     repo: "{{ item }}"
     state: present
   loop:
-    - "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
-    - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    - "{{ node_source_repo_1 }}"
+    - "{{ node_source_repo_2 }}"
   become: true
   register: node_repo
 
 - name: Update apt cache if repo was added.
   apt: update_cache=yes
   when: node_repo.changed
+  tags:
+    - skip_ansible_lint
   become: true
 
 - name: Ensure Node.js and npm are installed.
@@ -101,6 +108,7 @@
   template:
     src: "vhost.conf.j2"
     dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
+    mode: 0644
   notify: Restart Nginx
   become: true
 
