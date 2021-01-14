@@ -1,6 +1,5 @@
 
-![Ansible Lint](https://github.com/tenantcloud/ansible-role-laravel/workflows/Ansible%20Lint/badge.svg?branch-master)
-![Yaml Lint](https://github.com/tenantcloud/ansible-role-laravel/workflows/Yaml%20Lint/badge.svg?branch-master)
+![Lint Ansible Roles](https://github.com/tenantcloud/ansible-role-laravel/workflows/Lint%20Ansible%20Roles/badge.svg?branch-master)
 
 TenantCloud Laravel Role
 =========
