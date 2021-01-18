@@ -12,7 +12,5 @@ jobs:
         with:
           targets: "./"
           args: -x 106
-      - name: checkout
-        uses: actions/checkout@v2
       - name: yaml-lint
         uses: ibiqlik/action-yamllint@v1
