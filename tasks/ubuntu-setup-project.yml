@@ -4,17 +4,9 @@
     repo: "{{ project_git }}"
     dest: "{{ work_dir }}"
     version: "{{ project_git_branch }}"
-    accept_hostkey: true
-  become: true
-
-- name: Change permissions
-  file:
-    path: "{{ work_dir }}"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    recurse: true
-    mode: 0644
-  become: true
+    force: true
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
 
 - name: Copy environment file
   copy:
@@ -31,89 +23,68 @@
     line: "{{ item.line }}"
     mode: 0644
   loop:
-    - {path: '{{ work_dir }}/.env', regexp: '^APP_URL=', line: 'APP_URL=https://{{ work_domain }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^DB_HOST=', line: 'DB_HOST={{ mysql_host }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^DB_USERNAME=', line: 'DB_USERNAME={{ mysql_db_user }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD={{ mysql_db_user_pass }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^DB_DATABASE=', line: 'DB_DATABASE={{ mysql_database }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^S3_KEY=', line: 'S3_KEY={{ s3_key }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^S3_SECRET_KEY=', line: 'S3_SECRET_KEY={{ s3_secret }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^S3_AWS_URL=', line: 'S3_AWS_URL={{ s3_host }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^S3_BUCKET=', line: 'S3_BUCKET={{ s3_bucket }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^S3_REGION=', line: 'S3_REGION={{ s3_region }}'}
-    - {path: '{{ work_dir }}/.env', regexp: '^S3_USE_ENDPOINT=', line: 'S3_USE_ENDPOINT=true'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DOCKER_MAILHOG_PORT=', line: 'DOCKER_MAILHOG_PORT={{ docker_mailhog_port }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DOCKER_MINIO_PORT=', line: 'DOCKER_MINIO_PORT={{ docker_minio_port }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DOCKER_MYSQL_PORT=', line: 'DOCKER_MYSQL_PORT={{ docker_mysql_port }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DOCKER_APP_PORT=', line: 'DOCKER_APP_PORT={{ docker_app_port }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DOCKER_SUPERVISOR_PORT=', line: 'DOCKER_SUPERVISOR_PORT={{ docker_supervisor_port }}'}
+    - {path: '{{ work_dir }}/.env', regexp: '^DOCKER_SUPERVISOR_PORT_QUEUE=', line: 'DOCKER_SUPERVISOR_PORT_QUEUE={{ docker_supervisor_port_queue }}'}
 # yamllint enable
 
-- name: Install PyMySQL
-  pip:
-    name: pymysql
-    executable: pip3
+- name: Start services via docker-compose
+  command: |
+    bash -lc "cd {{ work_dir }} \
+    && docker-compose up -d"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  changed_when: false
+
+- name: Copy docker deploy script file
+  copy:
+    src: "files/docker-ubuntu.sh"
+    dest: "{{ work_dir }}/sh/install/docker-from-ansible.sh"
+    mode: 0777
+
+- name: Copy nginx script file
+  copy:
+    src: "files/nginx-ubuntu.sh"
+    dest: "{{ work_dir }}/sh/install/nginx-from-ansible.sh"
+    mode: 0777
+
+- name: Run deploy dashboard script
+  command: |
+    bash -lc "cd {{ work_dir }} \
+    && sh/install/docker-from-ansible.sh"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  ignore_errors: true
+  changed_when: false
   become: true
 
-- name: Create database
-  mysql_db:
-    login_user: "{{ mysql_admin_user }}"
-    login_password: "{{ mysql_admin_password }}"
-    name: "{{ mysql_database }}"
-    state: present
-
-- name: Create database user
-  mysql_user:
-    login_user: "{{ mysql_admin_user }}"
-    login_password: "{{ mysql_admin_password }}"
-    name: "{{ mysql_db_user }}"
-    password: "{{ mysql_db_user_pass }}"
-    priv: '{{ mysql_database }}.*:ALL'
-    state: present
-
-- name: Ensure Nodejs dependencies are present.
-  apt:
-    name:
-      - apt-transport-https
-      - gnupg2
-    state: present
+- name: Ser permission to mysql log dir
+  command: |
+    bash -lc "cd {{ work_dir }} \
+    && chmod -R 777 ../docker-data/{{ docker_app_name }}-log/mysql"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  ignore_errors: true
+  changed_when: false
   become: true
 
-- name: Add NodeSource apt key.
-  apt_key:
-    url: "{{ node_apt_key }}"
-    id: "68576280"
-    state: present
-  become: true
+- name: Restart mysql services via docker-compose
+  command: |
+    bash -lc "cd {{ work_dir }} \
+    && docker-compose restart mysql"
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  changed_when: false
 
-- name: Add NodeSource repositories for Node.js.
-  apt_repository:
-    repo: "{{ item }}"
-    state: present
-  loop:
-    - "{{ node_source_repo_1 }}"
-    - "{{ node_source_repo_2 }}"
-  become: true
-  register: node_repo
+- name: Remove docker deploy script file
+  ansible.builtin.file:
+    path: "{{ work_dir }}/sh/install/docker-from-ansible.sh"
+    state: absent
 
-- name: Update apt cache if repo was added.
-  apt: update_cache=yes
-  when: node_repo.changed
-  tags:
-    - skip_ansible_lint
-  become: true
-
-- name: Ensure Node.js and npm are installed.
-  apt:
-    name: "nodejs={{ nodejs_version|regex_replace('x', '') }}*"
-    state: present
-  become: true
-
-- name: Copy nginx config file
-  template:
-    src: "vhost.conf.j2"
-    dest: "/etc/nginx/sites-enabled/{{ work_domain }}.conf"
-    mode: 0644
-  notify: Restart Nginx
-  become: true
-
-- name: Create log directory
-  file:
-    path: "{{ ansible_env.HOME }}/.log"
-    state: directory
-    mode: "0755"
+- name: Remove nginx script file
+  ansible.builtin.file:
+    path: "{{ work_dir }}/sh/install/nginx-from-ansible.sh"
+    state: absent
