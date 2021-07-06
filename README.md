@@ -45,8 +45,8 @@ Example Playbook
 - name: Setup
   hosts: localhost
   vars:
-    ansible_user: "user"
-    ansible_pass: "qwerty123"
+    ansible_user: "username"
+    ansible_pass: "userpass"
     work_dir: "work"
     work_domain: 'laravel.tc.loc'
     project_git: 'git@github.com:tenantcloud/laravel-example.git'
