@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   role_name: laravel
-  author: Igor Bronovskyi
+  author: Oleh Debretseni
   description: Setup Laravel project on servers
   company: "TenantCloud LLC"
 

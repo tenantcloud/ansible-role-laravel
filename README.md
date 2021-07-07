@@ -1,5 +1,7 @@
 
 ![Lint Ansible Roles](https://github.com/tenantcloud/ansible-role-laravel/workflows/Lint%20Ansible%20Roles/badge.svg?branch-master)
+[![Build Status](https://github.com/tenantcloud/ansible-role-laravel/workflows/Enlarge%20version/badge.svg)](https://github.com/tenantcloud/ansible-role-laravel/workflows/Enlarge%20version/badge.svg)
+[![Stable Version](https://img.shields.io/github/v/tag/tenantcloud/ansible-role-laravel)](https://img.shields.io/github/v/tag/tenantcloud/ansible-role-laravel)
 
 TenantCloud Laravel Role
 =========
@@ -9,33 +11,28 @@ The role will enable rapid deployment of project Laravel
 Requirements
 ------------
 
-Need be installed NGINX, PHP, MySQL Server, Redis, Node
+MacOS Catalina or higher
+PHPStorm 2020.3.1
+tcctl package commands for development
+docker, docker-compose, git-lfs, gnu-sed, yq
 
 Role Variables
 --------------
 
 ansible_user:
-work_domain:
+ansible_pass:
 work_dir:
+work_domain:
 project_git:
 project_git_branch:
-mysql_host:
-mysql_admin_user:
-mysql_admin_password: 
-mysql_db_user:
-mysql_db_user_pass:
-mysql_database:
-s3_key:
-s3_secret:
-s3_host:
-s3_bucket:
-s3_region:
-socket:
-schedule:
-app_env:
-node_apt_key:
-node_source_repo_1:
-node_source_repo_2:
+nfs_install: false (true only for MacOs - if necessary)
+docker_app_name: "laravel"
+docker_mailhog_port:
+docker_minio_port:
+docker_mysql_port:
+docker_app_port:
+docker_supervisor_port:
+docker_supervisor_port_queue:
 
 Dependencies
 ------------
@@ -49,32 +46,19 @@ Example Playbook
 - name: Setup
   hosts: localhost
   vars:
-    ansible_user: 'ubuntu'
-    work_domain: 'laravel.dev'
-    work_dir: '/var/www/html/laravel'
-    project_git: 'git@github.com:tenantcloud/laravel-demo-project.git'
-    project_git_branch: 'master'
-    mysql_host: '127.0.0.1'
-    mysql_admin_user: 'root'
-    mysql_admin_password: 'rootpassword'
-    mysql_db_user: 'userdb'
-    mysql_db_user_pass: 'userdbpassword'
-    mysql_database: 'laraveldb'
-    s3_key: 'accesskey'
-    s3_secret: 'secretkey'
-    s3_host: 'https://s3.endpoint'
-    s3_bucket: 'laravelbucket'
-    s3_region: 'us-east-1'
-    socket: 'true'
-    schedule: 'true'
-    app_env: 'production'
-  remote_user: ubuntu
+    ansible_user: "username"
+    ansible_pass: "userpass"
+    work_dir: "work"
+    work_domain: 'laravel.tc.loc'
+    project_git: 'git@github.com:tenantcloud/laravel-example.git'
+    project_git_branch: 'main'
+    nfs_install: false
   roles:
     - tenantcloud.laravel
 ```
 
 ```yaml
-    work_dir: '/var/www/html/laravel' for linux or 'work' for macosx
+    work_dir: '/var/www/html/laravel.tc.loc' for linux or 'work' for macosx
 ``` 
 
 License

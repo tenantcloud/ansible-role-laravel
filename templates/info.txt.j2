@@ -1,0 +1,37 @@
+Congratulations, you have successfully installed {{ work_domain }} project.
+
+ Ansible role for install {{ work_domain }} project.
+
+  - tenantcloud_laravel
+
+  URL laravel site       - https://{{ work_domain }}
+  URL Minio site         - https://minio.{{ work_domain }}
+  URL Mailhog site       - https://mail.{{ work_domain }}
+  URL Supervisor site    - https://supervisor.{{ work_domain }}
+  URL Selenoid site      - https://selenoid.{{ work_domain }}
+
+  After full install manually trusts root certificate in the system!
+
+     - Run this command in the project directory:
+       bash -lc "cd {{ project_path }} && \
+       sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain docs/installation/ssl/tenantcloud-rootCA.crt"
+
+ If you want to pull the latest changes, switch to the necessary branch and run the script,
+ which can be found on the following path - {{ ansible_env.HOME }}/{{ work_dir }}/{{ work_domain }}/sh/update.sh
+
+ If you want to run basic tests, run the following from the project folder:
+
+     - Run frontend test:
+       yarn test
+
+     - Run backend test:
+       docker-compose exec home vendor/bin/phpunit
+
+     * Before run e2e users test please pull all this containers:
+
+       docker pull selenoid/vnc:chrome_87.0
+       docker pull selenoid/vnc:firefox_83.0
+       docker pull selenoid/vnc:opera_71.0
+
+     - Run e2e users test:
+       docker-compose exec -T node /app/sh/pipeline/frontend_e2e.sh

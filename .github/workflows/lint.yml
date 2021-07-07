@@ -8,7 +8,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: ansible-Lint
-        uses: ansible/ansible-lint-action@151b9a2
+        uses: ansible/ansible-lint-action@master
         with:
           targets: "./"
           args: -x 106
