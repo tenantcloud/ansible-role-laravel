@@ -18,6 +18,35 @@
     mode: 0644
     remote_src: true
 
+- name: Install pexpect
+  pip:
+    name:
+      - pexpect
+    executable: /usr/local/bin/pip3
+  when: nfs_install
+
+- name: Copy nfs script file
+  copy:
+    src: "files/nfs.sh"
+    dest: "{{ project_path }}/sh/install/nfs-from-ansible.sh"
+    mode: 0777
+  when: nfs_install
+
+- name: Run NFS configuration
+  become: true
+  become_user: "{{ ansible_user }}"
+  expect:
+    command: |
+      bash -lc "cd {{ project_path }} \
+      && sh/install/nfs-from-ansible.sh"
+    responses:
+      "Password:": "{{ ansible_pass }}"
+    timeout: 90
+  environment:
+    PATH: "{{ lookup('env','PATH') }}"
+  changed_when: false
+  when: nfs_install
+
 - name: Start services via docker-compose
   command: |
     bash -lc "cd {{ project_path }} \
@@ -57,6 +86,12 @@
   ansible.builtin.file:
     path: "{{ project_path }}/sh/install/nginx-from-ansible.sh"
     state: absent
+
+- name: Remove nfs script file
+  ansible.builtin.file:
+    path: "{{ project_path }}/sh/install/nfs-from-ansible.sh"
+    state: absent
+  when: nfs_install
 
 - name: Copy info file
   template:

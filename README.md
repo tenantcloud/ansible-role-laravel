@@ -25,6 +25,7 @@ work_dir:
 work_domain:
 project_git:
 project_git_branch:
+nfs_install: false (true only for MacOs - if necessary)
 docker_app_name: "laravel"
 docker_mailhog_port:
 docker_minio_port:
@@ -51,6 +52,7 @@ Example Playbook
     work_domain: 'laravel.tc.loc'
     project_git: 'git@github.com:tenantcloud/laravel-example.git'
     project_git_branch: 'main'
+    nfs_install: false
   roles:
     - tenantcloud.laravel
 ```
